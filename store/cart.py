@@ -18,7 +18,12 @@ class Cart(object):
         return Decimal(sum([item.get_line_total(self.product_store) for item in self.items]))
 
     def add(self, item, quantity=1):
-        '''Add an item to the cart.'''
+        '''
+        Add an item to the cart.
+
+        Adding an existing item is additive. The quantity will increase on an
+        existing item by the amount passed with the quantity parameter.
+        '''
         cart_item = self.get_item(item)
         if cart_item is None:
             cart_item = CartItem(item, quantity)
