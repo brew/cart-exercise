@@ -29,8 +29,9 @@ class Cart(object):
 
 class CartItem(object):
 
-    def __init__(self, product):
+    def __init__(self, product, quantity=1):
         self.product = product
+        self.quantity = quantity
 
     def get_line_total(self):
         '''Return total as a Decimal.'''

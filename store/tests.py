@@ -59,3 +59,15 @@ class CartItemTest(unittest.TestCase):
         '''Cart.get_line_total() returns a Decimal.'''
         cartitem = CartItem('apple')
         self.assertTrue(type(cartitem.get_line_total() is Decimal))
+
+    def test_quantity_on_create_with_no_value(self):
+        '''Creating a CartItem without passing a quantity initialises quantity
+        with 1.'''
+        cartitem = CartItem('apple')
+        self.assertEqual(cartitem.quantity, 1)
+
+    def test_quantity_on_create_with_value(self):
+        '''Creating a CartItem with a passed quantity initialises with that
+        quantity.'''
+        cartitem = CartItem('apple', 3)
+        self.assertEqual(cartitem.quantity, 3)
