@@ -87,10 +87,21 @@ class CartTest(unittest.TestCase):
 
 class CartItemTest(unittest.TestCase):
 
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+        ]
+        return ProductStore(products)
+
     def test_get_line_total_is_decimal(self):
         '''Cart.get_line_total() returns a Decimal.'''
+        product_store = self._create_product_store()
         cartitem = CartItem('apple')
-        self.assertTrue(type(cartitem.get_line_total() is Decimal))
+        self.assertTrue(type(cartitem.get_line_total(product_store) is Decimal))
 
     def test_quantity_on_create_with_no_value(self):
         '''Creating a CartItem without passing a quantity initialises quantity
@@ -104,27 +115,40 @@ class CartItemTest(unittest.TestCase):
         cartitem = CartItem('apple', 3)
         self.assertEqual(cartitem.quantity, 3)
 
+    def test_get_line_total(self):
+        '''Cart.get_line_total() returns the correct price for product.'''
+        product_store = self._create_product_store()
+        cartitem = CartItem('apple')
+        self.assertEqual(cartitem.get_line_total(product_store), Decimal('0.15'))
+
+    def test_get_line_total_multiple_quantity(self):
+        '''get_line_total returns the correct price for item with multiple
+        quantity.'''
+        product_store = self._create_product_store()
+        cartitem = CartItem('apple', 3)
+        self.assertEqual(cartitem.get_line_total(product_store), Decimal('0.45'))
+
 
 class ProductStoreTest(unittest.TestCase):
 
     def test_get_product_price(self):
         '''ProductStore returns corresponding price for product.'''
         products = [
-            ('apple', Decimal(0.15)),
-            ('ice cream', Decimal(3.49)),
-            ('strawberries', Decimal(2.00)),
-            ('snickers bar', Decimal(0.70)),
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
         ]
         product_store = ProductStore(products)
-        self.assertEqual(product_store.get_product_price('strawberries'), Decimal(2.00))
+        self.assertEqual(product_store.get_product_price('strawberries'), Decimal('2.00'))
 
     def test_get_product_price_no_product(self):
         '''ProductStore returns None when no product matches.'''
         products = [
-            ('apple', Decimal(0.15)),
-            ('ice cream', Decimal(3.49)),
-            ('strawberries', Decimal(2.00)),
-            ('snickers bar', Decimal(0.70)),
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
         ]
         product_store = ProductStore(products)
         self.assertTrue(product_store.get_product_price('bike') is None)

@@ -3,8 +3,9 @@ from decimal import Decimal
 
 class Cart(object):
 
-    def __init__(self):
+    def __init__(self, store=None):
         self.items = []
+        self.product_store = store
 
     def __len__(self):
         return len(self.items)
@@ -36,6 +37,6 @@ class CartItem(object):
         self.product = product
         self.quantity = quantity
 
-    def get_line_total(self):
-        '''Return total as a Decimal.'''
-        return Decimal(0)
+    def get_line_total(self, store):
+        '''Return total derived from product in store.'''
+        return store.get_product_price(self.product) * self.quantity
