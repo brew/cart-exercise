@@ -1,3 +1,4 @@
+import os
 import unittest
 from decimal import Decimal
 
@@ -168,24 +169,35 @@ class CartItemTest(unittest.TestCase):
 
 class ProductStoreTest(unittest.TestCase):
 
-    def test_get_product_price(self):
-        '''ProductStore returns corresponding price for product.'''
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
         products = [
             ('apple', Decimal('0.15')),
             ('ice cream', Decimal('3.49')),
             ('strawberries', Decimal('2.00')),
             ('snickers bar', Decimal('0.70')),
         ]
-        product_store = ProductStore(products)
+        return ProductStore(products)
+
+    def test_get_product_price(self):
+        '''ProductStore returns corresponding price for product.'''
+        product_store = self._create_product_store()
         self.assertEqual(product_store.get_product_price('strawberries'), Decimal('2.00'))
 
     def test_get_product_price_no_product(self):
         '''ProductStore returns None when no product matches.'''
-        products = [
-            ('apple', Decimal('0.15')),
-            ('ice cream', Decimal('3.49')),
-            ('strawberries', Decimal('2.00')),
-            ('snickers bar', Decimal('0.70')),
-        ]
-        product_store = ProductStore(products)
+        product_store = self._create_product_store()
         self.assertTrue(product_store.get_product_price('bike') is None)
+
+    def test_init_from_filepath(self):
+        '''ProductStore object can be created from csv file.'''
+        csv_filepath = os.path.abspath('test_products.csv')
+        product_store = ProductStore.init_from_filepath(csv_filepath)
+        self.assertEqual(len(product_store.items), 4)
+
+    def test_item_after_init_from_filepath(self):
+        '''An item's price can be retrieved from a ProductStore that's been
+        created from a csv file.'''
+        csv_filepath = os.path.abspath('test_products.csv')
+        product_store = ProductStore.init_from_filepath(csv_filepath)
+        self.assertEqual(product_store.get_product_price('apple'), Decimal('0.15'))

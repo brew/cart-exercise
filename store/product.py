@@ -1,6 +1,19 @@
+import csv
+from decimal import Decimal
+
 
 class ProductStore(object):
     '''A naive store mapping products to prices.'''
+
+    @classmethod
+    def init_from_filepath(cls, filepath):
+        '''Return an instance initialized from a CSV file.'''
+        with open(filepath, 'rb') as csvfile:
+            csvreader = csv.reader(csvfile)
+            items = []
+            for row in csvreader:
+                items.append((row[0], Decimal(row[1])))
+        return cls(items)
 
     def __init__(self, items):
         '''Expects items in the format:
