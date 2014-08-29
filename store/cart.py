@@ -16,14 +16,17 @@ class Cart(object):
         '''Return sum of cart items as a Decimal.'''
         return Decimal(0)
 
-    def add(self, item):
+    def add(self, item, quantity=1):
         '''Add an item to the cart.'''
-        if self.get_item(item) is None:
-            cart_item = CartItem(item)
+        cart_item = self.get_item(item)
+        if cart_item is None:
+            cart_item = CartItem(item, quantity)
             self.items.append(cart_item)
+        else:
+            cart_item.quantity += quantity
 
     def get_item(self, item_name):
-        '''Return CartItem who's product corresponses with item_name.'''
+        '''Return CartItem who's product corresponds with item_name.'''
         return next((item for item in self.items if item.product == item_name), None)
 
 

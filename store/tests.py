@@ -38,6 +38,37 @@ class CartTest(unittest.TestCase):
         cart.add('apple')
         self.assertEqual(len(cart), 1)
 
+    def test_add_two_same_item_increases_quantity(self):
+        '''Adding an item that is already in the cart increases its
+        quantity.'''
+        cart = Cart()
+        cart.add('apple')
+        cart.add('apple')
+        cartitem = cart.get_item('apple')
+        self.assertEqual(cartitem.quantity, 2)
+
+    def test_add_with_no_quantity(self):
+        '''Adding an item without defining a quantity creates an item with a
+        quantity of 1.'''
+        cart = Cart()
+        cart.add('apple')
+        self.assertEqual(cart.get_item('apple').quantity, 1)
+
+    def test_add_with_quantity(self):
+        '''Adding an item with a quantity creates cart item with appropriate
+        quantity.'''
+        cart = Cart()
+        cart.add('apple', 3)
+        self.assertEqual(cart.get_item('apple').quantity, 3)
+
+    def test_add_with_quantity_to_existing_item(self):
+        '''Adding an item with a quantity increases the quantity of an
+        existing item.'''
+        cart = Cart()
+        cart.add('apple', 2)
+        cart.add('apple', 3)
+        self.assertEqual(cart.get_item('apple').quantity, 5)
+
     def test_get_item(self):
         '''cart.get_item() returns expected CartItem.'''
         cart = Cart()
