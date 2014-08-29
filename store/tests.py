@@ -7,6 +7,16 @@ from product import ProductStore
 
 class CartTest(unittest.TestCase):
 
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+        ]
+        return ProductStore(products)
+
     def test_get_total_is_decimal(self):
         '''Cart.get_total() returns a Decimal.'''
         cart = Cart()
@@ -83,6 +93,33 @@ class CartTest(unittest.TestCase):
         '''Attempt to get item with no corresponding CartItem returns None.'''
         cart = Cart()
         self.assertEqual(cart.get_item('apple'), None)
+
+    def test_get_total_one_item(self):
+        '''Correct total for one item in cart.'''
+        cart = Cart(self._create_product_store())
+        cart.add('apple')
+        self.assertEqual(cart.get_total(), Decimal('0.15'))
+
+    def test_get_total_one_item_multiple_quantity(self):
+        '''Correct total for one item with multiple quantity in cart.'''
+        cart = Cart(self._create_product_store())
+        cart.add('apple', 3)
+        self.assertEqual(cart.get_total(), Decimal('0.45'))
+
+    def test_get_total_multiple_items(self):
+        '''Correct total for multiple items in cart.'''
+        cart = Cart(self._create_product_store())
+        cart.add('apple')
+        cart.add('strawberries')
+        self.assertEqual(cart.get_total(), Decimal('2.15'))
+
+    def test_get_total_multiple_items_multiple_quantity(self):
+        '''Correct total for multiple items with multiple quantities in
+        cart.'''
+        cart = Cart(self._create_product_store())
+        cart.add('apple', 2)
+        cart.add('strawberries', 3)
+        self.assertEqual(cart.get_total(), Decimal('6.30'))
 
 
 class CartItemTest(unittest.TestCase):

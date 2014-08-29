@@ -15,7 +15,7 @@ class Cart(object):
 
     def get_total(self):
         '''Return sum of cart items as a Decimal.'''
-        return Decimal(0)
+        return Decimal(sum([item.get_line_total(self.product_store) for item in self.items]))
 
     def add(self, item, quantity=1):
         '''Add an item to the cart.'''
@@ -27,7 +27,7 @@ class Cart(object):
             cart_item.quantity += quantity
 
     def get_item(self, item_name):
-        '''Return CartItem who's product corresponds with item_name.'''
+        '''Return CartItem where product corresponds with item_name.'''
         return next((item for item in self.items if item.product == item_name), None)
 
 
