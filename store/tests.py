@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from cart import Cart, CartItem
 from product import ProductStore
+from offers import NoOffer
 
 
 class CartTest(unittest.TestCase):
@@ -201,3 +202,30 @@ class ProductStoreTest(unittest.TestCase):
         csv_filepath = os.path.abspath('test_products.csv')
         product_store = ProductStore.init_from_filepath(csv_filepath)
         self.assertEqual(product_store.get_product_price('apple'), Decimal('0.15'))
+
+
+class NoOfferTest(unittest.TestCase):
+    '''Tests for the NoOffer offer class.'''
+
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+        ]
+        return ProductStore(products)
+
+    def test_nooffer_target(self):
+        '''NoOffer's target is correctly assigned.'''
+        no_offer_strawberries = NoOffer('strawberries')
+        self.assertEqual(no_offer_strawberries.target_product, 'strawberries')
+
+    def test_nooffer_total(self):
+        '''NoOffer's calculate_line_total returns same value as cart item line
+        total.'''
+        product_store = self._create_product_store()
+        no_offer_strawberries = NoOffer('strawberries')
+        cartitem = CartItem('strawberries')
+        self.assertEqual(cartitem.get_line_total(product_store), no_offer_strawberries.calculate_line_total(cartitem, product_store))
