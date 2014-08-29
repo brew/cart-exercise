@@ -28,7 +28,29 @@ class CartTest(unittest.TestCase):
         cart = Cart()
         cart.add('apple')
         cart.add('orange')
-        self.assertTrue(len(cart), 2)
+        self.assertEqual(len(cart), 2)
+
+    def test_add_two_same_item(self):
+        '''Adding more than one of the same item does not create duplicate
+        CartItems.'''
+        cart = Cart()
+        cart.add('apple')
+        cart.add('apple')
+        self.assertEqual(len(cart), 1)
+
+    def test_get_item(self):
+        '''cart.get_item() returns expected CartItem.'''
+        cart = Cart()
+        cart.add('apple')
+        cart.add('orange')
+        returned_cart_item = cart.get_item('apple')
+        self.assertTrue(type(returned_cart_item) is CartItem)
+        self.assertEqual(returned_cart_item.product, 'apple')
+
+    def test_get_item_not_in_cart(self):
+        '''Attempt to get item with no corresponding CartItem returns None.'''
+        cart = Cart()
+        self.assertEqual(cart.get_item('apple'), None)
 
 
 class CartItemTest(unittest.TestCase):
