@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from cart import Cart, CartItem
 from product import ProductStore
-from offers import NoOffer
+from offers import NoOffer, BogofOffer
 
 
 class CartTest(unittest.TestCase):
@@ -229,3 +229,58 @@ class NoOfferTest(unittest.TestCase):
         no_offer_strawberries = NoOffer('strawberries')
         cartitem = CartItem('strawberries')
         self.assertEqual(cartitem.get_line_total(product_store), no_offer_strawberries.calculate_line_total(cartitem, product_store))
+
+
+class BogofOfferTest(unittest.TestCase):
+
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+        ]
+        return ProductStore(products)
+
+    def test_bogof_one_item(self):
+        '''Correct line total for item with 1 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple')
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.15'))
+
+    def test_bogof_one_item_two_quantity(self):
+        '''Correct line total for item with 2 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple', 2)
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.15'))
+
+    def test_bogof_one_item_three_quantity(self):
+        '''Correct line total for item with 3 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple', 3)
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.30'))
+
+    def test_bogof_one_item_four_quantity(self):
+        '''Correct line total for item with 4 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple', 4)
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.30'))
+
+    def test_bogof_one_item_five_quantity(self):
+        '''Correct line total for item with 5 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple', 5)
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.45'))
+
+    def test_bogof_one_item_six_quantity(self):
+        '''Correct line total for item with 6 quantity.'''
+        product_store = self._create_product_store()
+        bogof_apples = BogofOffer('apple')
+        cartitem = CartItem('apple', 6)
+        self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.45'))
