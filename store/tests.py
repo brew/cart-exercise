@@ -2,6 +2,7 @@ import unittest
 from decimal import Decimal
 
 from cart import Cart, CartItem
+from product import ProductStore
 
 
 class CartTest(unittest.TestCase):
@@ -102,3 +103,28 @@ class CartItemTest(unittest.TestCase):
         quantity.'''
         cartitem = CartItem('apple', 3)
         self.assertEqual(cartitem.quantity, 3)
+
+
+class ProductStoreTest(unittest.TestCase):
+
+    def test_get_product_price(self):
+        '''ProductStore returns corresponding price for product.'''
+        products = [
+            ('apple', Decimal(0.15)),
+            ('ice cream', Decimal(3.49)),
+            ('strawberries', Decimal(2.00)),
+            ('snickers bar', Decimal(0.70)),
+        ]
+        product_store = ProductStore(products)
+        self.assertEqual(product_store.get_product_price('strawberries'), Decimal(2.00))
+
+    def test_get_product_price_no_product(self):
+        '''ProductStore returns None when no product matches.'''
+        products = [
+            ('apple', Decimal(0.15)),
+            ('ice cream', Decimal(3.49)),
+            ('strawberries', Decimal(2.00)),
+            ('snickers bar', Decimal(0.70)),
+        ]
+        product_store = ProductStore(products)
+        self.assertTrue(product_store.get_product_price('bike') is None)
