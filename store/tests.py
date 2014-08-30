@@ -434,7 +434,7 @@ class DependentDiscountOfferTest(unittest.TestCase):
         '''One target product in the absence of its dependent product doesn't
         trigger discount.'''
         product_store = self._create_product_store()
-        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', Decimal('0.2'))
         cart = Cart(product_store)
         mars_cartitem = cart.add('mars bar')
         self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('0.65'))
@@ -443,7 +443,7 @@ class DependentDiscountOfferTest(unittest.TestCase):
         '''One target product in the presence of one dependent product
         triggers discount.'''
         product_store = self._create_product_store()
-        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', Decimal('0.2'))
         cart = Cart(product_store)
         mars_cartitem = cart.add('mars bar')
         cart.add('snickers bar')
@@ -453,7 +453,7 @@ class DependentDiscountOfferTest(unittest.TestCase):
         '''One target product in the presence of two dependent products
         triggers discount.'''
         product_store = self._create_product_store()
-        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', Decimal('0.2'))
         cart = Cart(product_store)
         mars_cartitem = cart.add('mars bar')
         cart.add('snickers bar', 2)
@@ -463,8 +463,53 @@ class DependentDiscountOfferTest(unittest.TestCase):
         '''Two target product in the presence of one dependent product
         triggers discount.'''
         product_store = self._create_product_store()
-        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', Decimal('0.2'))
         cart = Cart(product_store)
         mars_cartitem = cart.add('mars bar', 2)
         cart.add('snickers bar')
         self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('1.17'))
+
+
+class CartOffersTest(unittest.TestCase):
+    '''Test Cart containing cart items with offers applied.'''
+
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+            ('mars bar', Decimal('0.65'))
+        ]
+        return ProductStore(products)
+
+    def test_get_total_with_one_offer(self):
+        '''Cart get_total returns correct value with a bogof offer applied.'''
+        product_store = self._create_product_store()
+        bogof_strawberries = MultiBuyOffer('strawberries', 1, 1)
+        cart = Cart(product_store)
+        cart.add('strawberries', 2)
+        cart.add('apple')
+        self.assertEqual(cart.get_total(offers=[bogof_strawberries]), Decimal('2.15'))
+
+    def test_get_total_with_dependent_discount_offer(self):
+        '''Cart get_total returns correct value with a dependent discount
+        offer applied.'''
+        product_store = self._create_product_store()
+        strawberries_apple_20_discount = DependentDiscountOffer('strawberries', 'apple', Decimal('0.2'))
+        cart = Cart(product_store)
+        cart.add('strawberries', 2)
+        cart.add('apple')
+        self.assertEqual(cart.get_total(offers=[strawberries_apple_20_discount]), Decimal('3.75'))
+
+    def test_get_total_with_two_offers_on_same_target(self):
+        '''Cart get_total returns cheapest total when two offers are
+        applicable for the same target.'''
+        product_store = self._create_product_store()
+        bogof_strawberries = MultiBuyOffer('strawberries', 1, 1)
+        strawberries_apple_20_discount = DependentDiscountOffer('strawberries', 'apple', Decimal('0.2'))
+        cart = Cart(product_store)
+        cart.add('strawberries', 2)
+        cart.add('apple')
+        self.assertEqual(cart.get_total(offers=[bogof_strawberries, strawberries_apple_20_discount]), Decimal('2.15'))
