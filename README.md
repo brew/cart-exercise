@@ -25,6 +25,12 @@ csv_filepath = os.path.abspath('products.csv')
 product_store = ProductStore.init_from_filepath(csv_filepath)
 ```
 
+The price for a product can be retrieved with `get_product_price()`.
+
+```python
+price = product_store.get_product_price('strawberries')
+```
+
 ## Cart
 
 Carts should be created with a ProductStore instance from which the cart can derive prices.
