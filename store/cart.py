@@ -30,7 +30,8 @@ class Cart(object):
                 # Apply each offer in turn
                 for offer in offers:
                     if offer.target_product == item.product:
-                        offer_total = offer.calculate_line_total(item, self.product_store, self)
+                        offer_total = offer.calculate_line_total(
+                            item, self.product_store, self)
                         # Retain cheapest total to append to totals list.
                         if offer_total < line_total:
                             line_total = offer_total

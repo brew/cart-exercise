@@ -1,5 +1,6 @@
 
 class AbstractOffer(object):
+
     '''An interface for subclassing Offer classes.'''
 
     def __init__(self, target_product):
@@ -12,6 +13,7 @@ class AbstractOffer(object):
 
 
 class NoOffer(AbstractOffer):
+
     '''The simplest offer, is no offer at all.'''
 
     def calculate_line_total(self, cart_item, store, *args):
@@ -20,6 +22,7 @@ class NoOffer(AbstractOffer):
 
 
 class MultiBuyOffer(AbstractOffer):
+
     '''
     Buy a certain quantity to get another quantity free.
 
@@ -36,7 +39,8 @@ class MultiBuyOffer(AbstractOffer):
 
     def calculate_line_total(self, cart_item, store, *args):
         '''Charge for multiples of the quotient and add remainder.'''
-        bundles, remainder = divmod(cart_item.quantity, self.charge_for_quantity + self.free_quantity)
+        bundles, remainder = divmod(
+            cart_item.quantity, self.charge_for_quantity + self.free_quantity)
         if remainder > self.charge_for_quantity:
             bundles += 1
             remainder = 0
@@ -45,13 +49,15 @@ class MultiBuyOffer(AbstractOffer):
 
 
 class DependentDiscountOffer(AbstractOffer):
+
     '''A percentage discount is applied to the target_product in the presence
     of another product.'''
 
     def __init__(self, target_product, dependent_product, discount, *args, **kwargs):
         self.dependent_product = dependent_product
         self.discount = discount
-        super(DependentDiscountOffer, self).__init__(target_product, *args, **kwargs)
+        super(DependentDiscountOffer, self).__init__(
+            target_product, *args, **kwargs)
 
     def calculate_line_total(self, cart_item, store, cart, *args):
         '''Return total for cart_item taking into account the eligible
@@ -69,8 +75,10 @@ class DependentDiscountOffer(AbstractOffer):
             # Subtotal for eligible target_product before discount.
             eligible_subtotal = eligible_for_discount * single_full_price
             # Total for eligible target_product after discount.
-            eligible_total = eligible_subtotal - (eligible_subtotal * self.discount)
+            eligible_total = eligible_subtotal - \
+                (eligible_subtotal * self.discount)
             # Total for ineligible target_product
-            remainder_total = (cart_item.quantity - eligible_for_discount) * single_full_price
+            remainder_total = (
+                cart_item.quantity - eligible_for_discount) * single_full_price
 
             return eligible_total + remainder_total

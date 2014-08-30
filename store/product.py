@@ -3,6 +3,7 @@ from decimal import Decimal
 
 
 class ProductStore(object):
+
     '''A naive store mapping products to prices.'''
 
     @classmethod
