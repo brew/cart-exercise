@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from cart import Cart, CartItem
 from product import ProductStore
-from offers import NoOffer, MultiBuyOffer
+from offers import NoOffer, MultiBuyOffer, DependentDiscountOffer
 
 
 class CartTest(unittest.TestCase):
@@ -194,7 +194,7 @@ class ProductStoreTest(unittest.TestCase):
         '''ProductStore object can be created from csv file.'''
         csv_filepath = os.path.abspath('test_products.csv')
         product_store = ProductStore.init_from_filepath(csv_filepath)
-        self.assertEqual(len(product_store.items), 4)
+        self.assertEqual(len(product_store.items), 5)
 
     def test_item_after_init_from_filepath(self):
         '''An item's price can be retrieved from a ProductStore that's been
@@ -415,3 +415,56 @@ class MultiBuyOfferTest(unittest.TestCase):
         multibuy_apples = MultiBuyOffer('apple', 5, 2)
         cartitem = CartItem('apple', 8)
         self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.90'))
+
+
+class DependentDiscountOfferTest(unittest.TestCase):
+
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+            ('mars bar', Decimal('0.65'))
+        ]
+        return ProductStore(products)
+
+    def test_one_without_dependent(self):
+        '''One target product in the absence of its dependent product doesn't
+        trigger discount.'''
+        product_store = self._create_product_store()
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        cart = Cart(product_store)
+        mars_cartitem = cart.add('mars bar')
+        self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('0.65'))
+
+    def test_one_with_one_dependent(self):
+        '''One target product in the presence of one dependent product
+        triggers discount.'''
+        product_store = self._create_product_store()
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        cart = Cart(product_store)
+        mars_cartitem = cart.add('mars bar')
+        cart.add('snickers bar')
+        self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('0.52'))
+
+    def test_one_with_two_dependent(self):
+        '''One target product in the presence of two dependent products
+        triggers discount.'''
+        product_store = self._create_product_store()
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        cart = Cart(product_store)
+        mars_cartitem = cart.add('mars bar')
+        cart.add('snickers bar', 2)
+        self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('0.52'))
+
+    def test_two_with_one_dependent(self):
+        '''Two target product in the presence of one dependent product
+        triggers discount.'''
+        product_store = self._create_product_store()
+        mars_snickers_20_discount = DependentDiscountOffer('mars bar', 'snickers bar', '0.2')
+        cart = Cart(product_store)
+        mars_cartitem = cart.add('mars bar', 2)
+        cart.add('snickers bar')
+        self.assertEqual(mars_snickers_20_discount.calculate_line_total(mars_cartitem, product_store, cart), Decimal('1.17'))
