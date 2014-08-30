@@ -3,7 +3,7 @@ import unittest
 from decimal import Decimal
 
 from cart import Cart, CartItem
-from product import ProductStore
+from product import ProductStore, NoSuchProductError
 from offers import NoOffer, MultiBuyOffer, DependentDiscountOffer
 
 
@@ -190,9 +190,9 @@ class ProductStoreTest(unittest.TestCase):
             product_store.get_product_price('strawberries'), Decimal('2.00'))
 
     def test_get_product_price_no_product(self):
-        '''ProductStore returns None when no product matches.'''
+        '''ProductStore raises exception when no product matches.'''
         product_store = self._create_product_store()
-        self.assertTrue(product_store.get_product_price('bike') is None)
+        self.assertRaises(NoSuchProductError, product_store.get_product_price, 'bike')
 
     def test_init_from_filepath(self):
         '''ProductStore object can be created from csv file.'''

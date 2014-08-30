@@ -2,6 +2,10 @@ import csv
 from decimal import Decimal
 
 
+class NoSuchProductError(Exception):
+    pass
+
+
 class ProductStore(object):
 
     '''A naive store mapping products to prices.'''
@@ -31,4 +35,8 @@ class ProductStore(object):
 
     def get_product_price(self, product_name):
         '''Return the price corresponding with the passed product_name.'''
-        return next((prod[1] for prod in self.items if prod[0] == product_name), None)
+        product_price = next((prod[1] for prod in self.items if prod[0] == product_name), None)
+        if product_price is None:
+            raise NoSuchProductError('No such product "{product_name}" in this store.'.format(product_name=product_name))
+        else:
+            return product_price
