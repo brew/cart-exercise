@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 
 class AbstractOffer(object):
     '''An interface for subclassing Offer classes.'''
