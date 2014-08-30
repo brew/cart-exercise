@@ -27,3 +27,15 @@ class BogofOffer(AbstractOffer):
         quotient, remainder = divmod(cart_item.quantity, 2)
         charge_quantity = quotient + remainder
         return store.get_product_price(cart_item.product) * charge_quantity
+
+
+class BuyTwoGetThirdFreeOffer(AbstractOffer):
+    '''Buy two to get a third item free.'''
+
+    def calculate_line_total(self, cart_item, store):
+        '''Charge for multiples of the quotient and add remainder.'''
+        charge_for_quantity = 2
+        free_quantity = 1
+        quotient, remainder = divmod(cart_item.quantity, charge_for_quantity + free_quantity)
+        charge_quantity = (quotient * charge_for_quantity) + remainder
+        return store.get_product_price(cart_item.product) * charge_quantity

@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from cart import Cart, CartItem
 from product import ProductStore
-from offers import NoOffer, BogofOffer
+from offers import NoOffer, BogofOffer, BuyTwoGetThirdFreeOffer
 
 
 class CartTest(unittest.TestCase):
@@ -284,3 +284,65 @@ class BogofOfferTest(unittest.TestCase):
         bogof_apples = BogofOffer('apple')
         cartitem = CartItem('apple', 6)
         self.assertEqual(bogof_apples.calculate_line_total(cartitem, product_store), Decimal('0.45'))
+
+
+class BuyTwoGetThirdFreeOfferTest(unittest.TestCase):
+
+    def _create_product_store(self):
+        '''Helper method to create populated ProductStore.'''
+        products = [
+            ('apple', Decimal('0.15')),
+            ('ice cream', Decimal('3.49')),
+            ('strawberries', Decimal('2.00')),
+            ('snickers bar', Decimal('0.70')),
+        ]
+        return ProductStore(products)
+
+    def test_multibuy_one_item_buy_2_1_free(self):
+        '''Correct line total for item with 1 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple')
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.15'))
+
+    def test_multibuy_two_item_buy_2_1_free(self):
+        '''Correct line total for item with 2 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 2)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.30'))
+
+    def test_multibuy_three_item_buy_2_1_free(self):
+        '''Correct line total for item with 3 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 3)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.30'))
+
+    def test_multibuy_four_item_buy_2_1_free(self):
+        '''Correct line total for item with 4 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 4)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.45'))
+
+    def test_multibuy_five_item_buy_2_1_free(self):
+        '''Correct line total for item with 5 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 5)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.60'))
+
+    def test_multibuy_six_item_buy_2_1_free(self):
+        '''Correct line total for item with 6 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 6)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.60'))
+
+    def test_multibuy_seven_item_buy_2_1_free(self):
+        '''Correct line total for item with 7 quantity (buy 2 get 1 free).'''
+        product_store = self._create_product_store()
+        multibuy_apples = BuyTwoGetThirdFreeOffer('apple')
+        cartitem = CartItem('apple', 7)
+        self.assertEqual(multibuy_apples.calculate_line_total(cartitem, product_store), Decimal('0.75'))
